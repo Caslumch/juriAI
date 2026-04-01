@@ -1,0 +1,303 @@
+@import "tailwindcss";
+
+/* ============================================================
+   LEXIA DESIGN SYSTEM — CSS Tokens (Modern Minimal)
+   ============================================================ */
+
+:root {
+  /* --- Cores Primárias --- */
+  --color-primary: #2563EB;
+  --color-primary-light: #60A5FA;
+  --color-primary-bg: #EFF6FF;
+
+  /* --- Cores Semânticas --- */
+  --color-success: #16A34A;
+  --color-success-bg: #F0FDF4;
+  --color-warning: #D97706;
+  --color-warning-bg: #FFFBEB;
+  --color-danger: #DC2626;
+  --color-danger-bg: #FEF2F2;
+
+  /* --- Neutras (modo claro) --- */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F8FAFC;
+  --color-bg-tertiary: #F1F5F9;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #94A3B8;
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+
+  /* --- Tags de tipo de processo --- */
+  --tag-civel-bg: #EFF6FF;
+  --tag-civel-text: #2563EB;
+  --tag-trabalhista-bg: #F0FDF4;
+  --tag-trabalhista-text: #16A34A;
+  --tag-consumidor-bg: #FFFBEB;
+  --tag-consumidor-text: #D97706;
+  --tag-criminal-bg: #FEF2F2;
+  --tag-criminal-text: #DC2626;
+  --tag-previdenciario-bg: #F5F3FF;
+  --tag-previdenciario-text: #7C3AED;
+  --tag-tributario-bg: #F0FDFA;
+  --tag-tributario-text: #0D9488;
+
+  /* --- Espaçamento (base 4px) --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* --- Border Radius --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+  --radius-bubble: 18px 18px 4px 18px;
+  --radius-bubble-ai: 4px 18px 18px 18px;
+
+  /* --- Bordas --- */
+  --border-default: 1px solid #E2E8F0;
+  --border-hover: 1px solid #CBD5E1;
+  --border-active: 1px solid #94A3B8;
+  --border-info: 1px solid #BFDBFE;
+  --border-success: 1px solid #BBF7D0;
+  --border-warning: 1px solid #FDE68A;
+  --border-danger: 1px solid #FECACA;
+
+  /* --- Sombras --- */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+
+  /* --- Tipografia --- */
+  --font-size-display: 24px;
+  --font-size-heading: 16px;
+  --font-size-subheading: 14px;
+  --font-size-body: 14px;
+  --font-size-small: 13px;
+  --font-size-caption: 12px;
+  --font-size-micro: 11px;
+
+  --line-height-display: 1.25;
+  --line-height-heading: 1.4;
+  --line-height-subheading: 1.45;
+  --line-height-body: 1.6;
+  --line-height-small: 1.5;
+  --line-height-caption: 1.45;
+  --line-height-micro: 1.35;
+
+  /* --- Layout --- */
+  --sidebar-width: 260px;
+  --sidebar-min: 240px;
+  --sidebar-max: 280px;
+  --data-panel-width: 320px;
+  --data-panel-min: 280px;
+  --data-panel-max: 360px;
+}
+
+/* ============================================================
+   TAILWIND v4 — @theme inline (mapeia tokens para classes)
+   ============================================================ */
+
+@theme inline {
+  /* Cores */
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-bg: var(--color-primary-bg);
+
+  --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --color-warning: var(--color-warning);
+  --color-warning-bg: var(--color-warning-bg);
+  --color-danger: var(--color-danger);
+  --color-danger-bg: var(--color-danger-bg);
+
+  --color-bg-primary: var(--color-bg-primary);
+  --color-bg-secondary: var(--color-bg-secondary);
+  --color-bg-tertiary: var(--color-bg-tertiary);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-border: var(--color-border);
+  --color-border-light: var(--color-border-light);
+
+  /* Fontes */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Espaçamento customizado */
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-8: var(--space-8);
+
+  /* Radius */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+
+  /* Shadows */
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+body {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
+}
+
+::selection {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+/* ============================================================
+   TYPOGRAPHY UTILITIES
+   ============================================================ */
+
+.text-display {
+  font-size: var(--font-size-display);
+  font-weight: 600;
+  line-height: var(--line-height-display);
+  letter-spacing: -0.025em;
+}
+
+.text-heading {
+  font-size: var(--font-size-heading);
+  font-weight: 600;
+  line-height: var(--line-height-heading);
+  letter-spacing: -0.015em;
+}
+
+.text-subheading {
+  font-size: var(--font-size-subheading);
+  font-weight: 500;
+  line-height: var(--line-height-subheading);
+  letter-spacing: -0.01em;
+}
+
+.text-body {
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: var(--line-height-body);
+}
+
+.text-small {
+  font-size: var(--font-size-small);
+  font-weight: 400;
+  line-height: var(--line-height-small);
+}
+
+.text-caption {
+  font-size: var(--font-size-caption);
+  font-weight: 400;
+  line-height: var(--line-height-caption);
+}
+
+.text-micro {
+  font-size: var(--font-size-micro);
+  font-weight: 400;
+  line-height: var(--line-height-micro);
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes typing-bounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 0.8;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-bubble-in {
+  animation: bubble-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 200ms ease-out both;
+}
+
+.animate-slide-up {
+  animation: slide-up 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.typing-dot {
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+
+/* --- Scrollbar Styling --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
