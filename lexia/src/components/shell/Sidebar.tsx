@@ -18,7 +18,10 @@ import {
   Plus,
   X,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { themeAtom } from "@/store/theme";
 
 interface ConversationItem {
   id: string;
@@ -36,7 +39,10 @@ const navItems = [
 export function Sidebar() {
   const [activeItem, setActiveItem] = useState("Chat");
   const [currentConversation, setCurrentConversation] = useAtom(currentConversationAtom);
+  const [theme, setTheme] = useAtom(themeAtom);
   const { data: session } = useSession();
+
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
 
@@ -201,6 +207,17 @@ export function Sidebar() {
           <span className="text-small text-text-secondary truncate flex-1">
             {userName}
           </span>
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-[28px] h-[28px] rounded-[var(--radius-sm)] text-text-tertiary hover:text-primary hover:bg-primary-bg transition-all duration-150"
+            title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+          >
+            {theme === "dark" ? (
+              <Sun size={16} strokeWidth={1.8} />
+            ) : (
+              <Moon size={16} strokeWidth={1.8} />
+            )}
+          </button>
           <form action={handleSignOut}>
             <button
               type="submit"

@@ -102,6 +102,64 @@
 }
 
 /* ============================================================
+   DARK MODE — Overrides
+   ============================================================ */
+
+.dark {
+  /* --- Cores Primárias (neutro/cinza) --- */
+  --color-primary: #A1A1AA;
+  --color-primary-light: #D4D4D8;
+  --color-primary-bg: #27272A;
+
+  /* --- Cores Semânticas --- */
+  --color-success: #4ADE80;
+  --color-success-bg: #14352A;
+  --color-warning: #FBBF24;
+  --color-warning-bg: #3D2E0A;
+  --color-danger: #F87171;
+  --color-danger-bg: #3B1616;
+
+  /* --- Neutras (modo escuro) --- */
+  --color-bg-primary: #18181B;
+  --color-bg-secondary: #1F1F23;
+  --color-bg-tertiary: #27272A;
+  --color-text-primary: #F4F4F5;
+  --color-text-secondary: #A1A1AA;
+  --color-text-tertiary: #52525B;
+  --color-border: #2E2E33;
+  --color-border-light: #232327;
+
+  /* --- Tags de tipo de processo --- */
+  --tag-civel-bg: #27272A;
+  --tag-civel-text: #D4D4D8;
+  --tag-trabalhista-bg: #14352A;
+  --tag-trabalhista-text: #86EFAC;
+  --tag-consumidor-bg: #3D2E0A;
+  --tag-consumidor-text: #FCD34D;
+  --tag-criminal-bg: #3B1616;
+  --tag-criminal-text: #FCA5A5;
+  --tag-previdenciario-bg: #2E1065;
+  --tag-previdenciario-text: #C4B5FD;
+  --tag-tributario-bg: #134E4A;
+  --tag-tributario-text: #5EEAD4;
+
+  /* --- Bordas --- */
+  --border-default: 1px solid #2E2E33;
+  --border-hover: 1px solid #3F3F46;
+  --border-active: 1px solid #52525B;
+  --border-info: 1px solid #27272A;
+  --border-success: 1px solid #14352A;
+  --border-warning: 1px solid #3D2E0A;
+  --border-danger: 1px solid #3B1616;
+
+  /* --- Sombras --- */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
    TAILWIND v4 — @theme inline (mapeia tokens para classes)
    ============================================================ */
 
@@ -172,6 +230,11 @@ body {
 ::selection {
   background: var(--color-primary-bg);
   color: var(--color-primary);
+}
+
+.dark ::selection {
+  background: var(--color-primary-bg);
+  color: var(--color-primary-light);
 }
 
 /* ============================================================
