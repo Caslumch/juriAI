@@ -1,4 +1,8 @@
-import { runOcrPipeline } from "@/lib/ocr";
+import { ocrService } from "@/services/ocr.service";
+import { createLogger, generateRequestId } from "@/lib/logger";
+import { handleApiError, ValidationError } from "@/lib/errors";
+
+const log = createLogger("api.ocr");
 
 const ALLOWED_TYPES = [
   "application/pdf",
@@ -6,42 +10,35 @@ const ALLOWED_TYPES = [
   "image/png",
   "image/webp",
 ];
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_SIZE = 10 * 1024 * 1024;
 
 export async function POST(request: Request) {
+  const requestId = generateRequestId();
+  const reqLog = log.child({ requestId });
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
     if (!file) {
-      return Response.json({ error: "Nenhum arquivo enviado" }, { status: 400 });
+      throw new ValidationError("Nenhum arquivo enviado");
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return Response.json(
-        { error: "Formato não suportado. Use PDF, JPEG, PNG ou WebP." },
-        { status: 400 },
+      throw new ValidationError(
+        "Formato não suportado. Use PDF, JPEG, PNG ou WebP.",
       );
     }
 
     if (file.size > MAX_SIZE) {
-      return Response.json(
-        { error: "Arquivo muito grande. Máximo: 10MB." },
-        { status: 400 },
-      );
+      throw new ValidationError("Arquivo muito grande. Máximo: 10MB.");
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const result = await runOcrPipeline(buffer, file.type);
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const result = await ocrService.processFile(buffer, file.type);
 
     return Response.json(result);
   } catch (error) {
-    console.error("[OCR] Pipeline error:", error);
-    return Response.json(
-      { error: "Erro ao processar OCR. Tente novamente." },
-      { status: 500 },
-    );
+    return handleApiError(error, reqLog);
   }
 }

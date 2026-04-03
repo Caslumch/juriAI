@@ -3,6 +3,7 @@
 import { useCallback, useRef, useEffect, useMemo, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
+import type { UIMessage } from "ai";
 import { useAtom } from "jotai";
 import { currentConversationAtom } from "@/store/chat";
 import { MessageList } from "@/components/chat/MessageList";
@@ -11,64 +12,21 @@ import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { DropZone } from "@/components/chat/DropZone";
 import { OcrProgress } from "@/components/chat/OcrProgress";
 import { useOcrExtraction } from "@/shared/hooks/useOcrExtraction";
+import { formatDocMessage } from "@/shared/utils/doc-message";
 import {
   createConversation,
   getConversationMessages,
 } from "@/app/actions/conversations";
 
-// Marker used to identify document messages in the chat
-const DOC_MARKER = "[[DOC:";
-const DOC_MARKER_END = "]]";
-
-export function formatDocMessage(
-  fileName: string,
-  provider: string,
-  confidence: number,
-  ocrText: string,
-  userMessage?: string,
-): string {
-  // Encode document info in a compact marker that won't be displayed
-  const meta = `${DOC_MARKER}${fileName}|${provider}|${confidence}${DOC_MARKER_END}`;
-  const parts = [meta];
-  if (userMessage) parts.push(userMessage);
-  parts.push(`\nTranscrição do documento:\n---\n${ocrText}\n---`);
-  if (!userMessage) {
-    parts.push(
-      "\nAnalise este documento jurídico. Identifique e resuma as informações principais.",
-    );
-  }
-  return parts.join("\n");
-}
-
-export function parseDocMessage(text: string): {
-  isDoc: boolean;
-  fileName?: string;
-  provider?: string;
-  confidence?: number;
-  userText?: string;
-} {
-  if (!text.startsWith(DOC_MARKER)) return { isDoc: false };
-
-  const endIdx = text.indexOf(DOC_MARKER_END);
-  if (endIdx === -1) return { isDoc: false };
-
-  const meta = text.slice(DOC_MARKER.length, endIdx);
-  const [fileName, provider, confidenceStr] = meta.split("|");
-
-  // Extract user text (between marker end and the transcription block)
-  const afterMarker = text.slice(endIdx + DOC_MARKER_END.length);
-  const transcriptionIdx = afterMarker.indexOf("\nTranscrição do documento:");
-  const userText =
-    transcriptionIdx > 0
-      ? afterMarker.slice(0, transcriptionIdx).trim()
-      : undefined;
-
+function dbMessageToUI(m: {
+  id: string;
+  role: string;
+  content: string;
+}): UIMessage {
   return {
-    isDoc: true,
-    fileName,
-    provider,
-    confidence: parseFloat(confidenceStr),
-    userText: userText || undefined,
+    id: m.id,
+    role: m.role as "user" | "assistant",
+    parts: [{ type: "text" as const, text: m.content }],
   };
 }
 
@@ -85,6 +43,9 @@ export function ChatArea() {
   const [chatInstanceId, setChatInstanceId] = useState(() =>
     currentConversation?.id ?? crypto.randomUUID(),
   );
+
+  // Mensagens pendentes para setar após troca de instância
+  const pendingMessagesRef = useRef<UIMessage[] | null>(null);
 
   const transport = useMemo(
     () =>
@@ -106,6 +67,14 @@ export function ChatArea() {
     conversationIdRef.current = currentConversation?.id ?? null;
   }, [currentConversation?.id]);
 
+  // Quando a instância do chat muda, setar as mensagens pendentes
+  useEffect(() => {
+    if (pendingMessagesRef.current) {
+      setMessages(pendingMessagesRef.current);
+      pendingMessagesRef.current = null;
+    }
+  }, [chatInstanceId, setMessages]);
+
   const prevConversationId = useRef(currentConversation?.id ?? null);
   useEffect(() => {
     const prevId = prevConversationId.current;
@@ -118,6 +87,7 @@ export function ChatArea() {
 
     if (newId === null) {
       conversationIdRef.current = null;
+      pendingMessagesRef.current = null;
       setChatInstanceId(crypto.randomUUID());
       return;
     }
@@ -126,18 +96,12 @@ export function ChatArea() {
       return;
     }
 
-    setChatInstanceId(newId);
+    // Carregar mensagens do banco, guardar como pendentes, trocar instância
     getConversationMessages(newId).then((msgs) => {
-      setMessages(
-        msgs.map((m) => ({
-          id: m.id,
-          role: m.role as "user" | "assistant",
-          content: m.content,
-          parts: [{ type: "text" as const, text: m.content }],
-        })),
-      );
+      pendingMessagesRef.current = msgs.map(dbMessageToUI);
+      setChatInstanceId(newId);
     });
-  }, [currentConversation?.id, setMessages, resetOcr]);
+  }, [currentConversation?.id, resetOcr]);
 
   const ensureConversation = useCallback(async () => {
     if (conversationIdRef.current) return conversationIdRef.current;
@@ -158,14 +122,12 @@ export function ChatArea() {
     async (content: string, file?: File) => {
       if (processingRef.current) return;
 
-      // Text-only message
       if (!file) {
         await ensureConversation();
         sendMessage({ text: content });
         return;
       }
 
-      // Message with file — run OCR first, then send combined
       processingRef.current = true;
       try {
         const ocrResult = await runOcr(file);
@@ -193,7 +155,6 @@ export function ChatArea() {
 
   const handleFileDrop = useCallback(
     async (file: File) => {
-      // Drag & drop — send immediately without user text
       await handleSend("", file);
     },
     [handleSend],
@@ -220,7 +181,7 @@ export function ChatArea() {
         onFileDrop={handleFileDrop}
         disabled={isLoading || processingRef.current}
       >
-        <MessageList messages={messages} />
+        <MessageList messages={messages} isStreaming={status === "streaming"} />
         <OcrProgress />
         {status === "submitted" && (
           <div className="px-[var(--space-6)] pb-[var(--space-3)]">

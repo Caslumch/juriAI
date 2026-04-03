@@ -1,8 +1,8 @@
 "use server";
 
-import { hash } from "bcryptjs";
-import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
+import { userService } from "@/services/user.service";
+import { AppError } from "@/lib/errors";
 import { z } from "zod/v4";
 import { AuthError } from "next-auth";
 
@@ -36,23 +36,17 @@ export async function register(
     return { error: parsed.error.issues[0].message };
   }
 
-  const { name, email, password } = parsed.data;
-
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) {
-    return { error: "Este email já está cadastrado" };
+  try {
+    await userService.register(parsed.data);
+  } catch (error) {
+    if (error instanceof AppError) return { error: error.message };
+    throw error;
   }
-
-  const passwordHash = await hash(password, 12);
-
-  await prisma.user.create({
-    data: { name, email, passwordHash },
-  });
 
   try {
     await signIn("credentials", {
-      email,
-      password,
+      email: parsed.data.email,
+      password: parsed.data.password,
       redirectTo: "/",
     });
   } catch (error) {
@@ -78,12 +72,10 @@ export async function login(
     return { error: parsed.error.issues[0].message };
   }
 
-  const { email, password } = parsed.data;
-
   try {
     await signIn("credentials", {
-      email,
-      password,
+      email: parsed.data.email,
+      password: parsed.data.password,
       redirectTo: "/",
     });
   } catch (error) {

@@ -8,19 +8,26 @@ import { Activity, FileText, LayoutGrid } from "lucide-react";
 
 export function AppShell() {
   const [dataPanelOpen, setDataPanelOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [dataPanelCollapsed, setDataPanelCollapsed] = useState(false);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-bg-secondary">
       {/* Sidebar — hidden on <768px, shown as side panel on md+ */}
-      <Sidebar />
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
+      />
 
       {/* Chat — flex-1, always visible */}
       <ChatArea />
 
-      {/* Data Panel — hidden drawer on <1024px, visible on lg+ */}
+      {/* Data Panel — hidden drawer on <1024px, collapsible on lg+ */}
       <DataPanel
         open={dataPanelOpen}
         onClose={() => setDataPanelOpen(false)}
+        collapsed={dataPanelCollapsed}
+        onToggleCollapse={() => setDataPanelCollapsed((v) => !v)}
       />
 
       {/* Mobile bottom tab bar (<768px) */}

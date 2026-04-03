@@ -15,10 +15,6 @@ export function useOcrExtraction() {
   const setProgress = useSetAtom(ocrProgressAtom);
   const setResult = useSetAtom(extractionResultAtom);
 
-  /**
-   * Executa apenas o OCR e retorna o texto transcrito.
-   * Usado pelo ChatArea para injetar o texto no chat.
-   */
   const runOcr = useCallback(
     async (file: File): Promise<OcrResult | null> => {
       try {
@@ -72,10 +68,6 @@ export function useOcrExtraction() {
     [setProgress, setResult],
   );
 
-  /**
-   * Executa a extração estruturada a partir do texto OCR.
-   * Roda em paralelo com o chat.
-   */
   const runExtraction = useCallback(
     async (ocrText: string): Promise<ExtractionResponse | null> => {
       try {

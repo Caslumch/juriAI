@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import type { UIMessage } from "ai";
-import { parseDocMessage } from "@/components/shell/ChatArea";
+import { parseDocMessage } from "@/shared/utils/doc-message";
+import { MarkdownRenderer } from "./MarkdownRenderer";
 import { FileText } from "lucide-react";
 
 function getTextContent(message: UIMessage): string {
@@ -160,7 +161,13 @@ export function UserMessage({ message }: { message: UIMessage }) {
   );
 }
 
-export function AIMessage({ message }: { message: UIMessage }) {
+export function AIMessage({
+  message,
+  isStreaming = false,
+}: {
+  message: UIMessage;
+  isStreaming?: boolean;
+}) {
   const text = getTextContent(message);
 
   return (
@@ -174,10 +181,17 @@ export function AIMessage({ message }: { message: UIMessage }) {
 
       <div className="max-w-[88%] flex flex-col gap-[3px]">
         <div
-          className="bg-bg-secondary text-body text-text-primary px-[var(--space-4)] py-[var(--space-3)] whitespace-pre-wrap shadow-xs"
+          className="bg-bg-secondary text-body text-text-primary px-[var(--space-4)] py-[var(--space-3)] shadow-xs overflow-hidden"
           style={{ borderRadius: "var(--radius-bubble-ai)" }}
         >
-          {text}
+          {isStreaming ? (
+            <span className="whitespace-pre-wrap">
+              {text}
+              <span className="inline-block w-[2px] h-[14px] bg-primary ml-[2px] align-middle animate-cursor-blink" />
+            </span>
+          ) : (
+            <MarkdownRenderer content={text} />
+          )}
         </div>
       </div>
     </div>

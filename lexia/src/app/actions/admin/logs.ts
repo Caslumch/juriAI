@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth/guards";
+import { adminService } from "@/services/admin.service";
 import type { ExtractionStatus } from "@/generated/prisma/client";
 
 export type ExtractionLogItem = {
@@ -41,80 +41,12 @@ export async function getExtractionLogs(
   filters: LogFilters,
 ): Promise<LogsResult> {
   await requireAdmin();
-
-  const where: Record<string, unknown> = {};
-
-  if (filters.status && filters.status !== "ALL") {
-    where.status = filters.status;
-  }
-
-  if (filters.search) {
-    where.document = {
-      fileName: { contains: filters.search, mode: "insensitive" },
-    };
-  }
-
-  if (filters.dateFrom || filters.dateTo) {
-    where.createdAt = {};
-    if (filters.dateFrom) {
-      (where.createdAt as Record<string, unknown>).gte = new Date(
-        filters.dateFrom,
-      );
-    }
-    if (filters.dateTo) {
-      (where.createdAt as Record<string, unknown>).lte = new Date(
-        filters.dateTo + "T23:59:59.999Z",
-      );
-    }
-  }
-
-  const page = filters.page ?? 1;
-  const perPage = filters.perPage ?? 20;
-
-  const [logs, total] = await Promise.all([
-    prisma.extraction.findMany({
-      where,
-      select: {
-        id: true,
-        status: true,
-        confidence: true,
-        processingTimeMs: true,
-        createdAt: true,
-        document: {
-          select: {
-            id: true,
-            fileName: true,
-            fileType: true,
-            user: {
-              select: { name: true, email: true },
-            },
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      skip: (page - 1) * perPage,
-      take: perPage,
-    }),
-    prisma.extraction.count({ where }),
-  ]);
-
+  const result = await adminService.getExtractionLogs(filters);
   return {
-    logs: logs.map((log) => ({
-      id: log.id,
-      status: log.status,
-      confidence: log.confidence,
-      processingTimeMs: log.processingTimeMs,
-      createdAt: log.createdAt,
-      document: {
-        id: log.document.id,
-        fileName: log.document.fileName,
-        fileType: log.document.fileType,
-      },
-      user: log.document.user,
-    })),
-    total,
-    page,
-    perPage,
+    logs: result.extractions,
+    total: result.total,
+    page: result.page,
+    perPage: result.perPage,
   };
 }
 
@@ -136,25 +68,5 @@ export async function getExtractionDetail(
   extractionId: string,
 ): Promise<ExtractionDetail | null> {
   await requireAdmin();
-
-  const extraction = await prisma.extraction.findUnique({
-    where: { id: extractionId },
-    select: {
-      id: true,
-      data: true,
-      confidence: true,
-      status: true,
-      processingTimeMs: true,
-      createdAt: true,
-      document: {
-        select: {
-          fileName: true,
-          fileType: true,
-          fileSize: true,
-        },
-      },
-    },
-  });
-
-  return extraction;
+  return adminService.getExtractionDetail(extractionId);
 }
